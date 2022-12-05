@@ -15,16 +15,16 @@ if [ ! -f /etc/perforce/p4dctl.conf.d/perforce.conf ]; then
     echo "Generating random master password..."
     MASTER_PASSWORD=$(pwgen -s 32 1)
     echo "Master password: $MASTER_PASSWORD"
-    /opt/perforce/sbin/configure-helix-p4d.sh $SERVER_ID -n -p ssl:1666 -r /perforce-data -u $MASTER_USER -P $MASTER_PASSWORD --unicode 
+    /opt/perforce/sbin/configure-helix-p4d.sh $SERVER_ID -n -p ssl:$P4PORT -r $P4ROOT -u $MASTER_USER -P $MASTER_PASSWORD --unicode 
 fi
 
 # if there are no SSL certificates, generate them
-export P4SSLDIR=/perforce-data/root/ssl
+export P4SSLDIR=$P4ROOT/root/ssl
 if [ ! -f $P4SSLDIR/certificate.txt ]; then
     echo "No SSL certificates found, re-generating them..."
-    su - perforce -c "export P4SSLDIR=/perforce-data/root/ssl && p4d -Gc"
+    su - perforce -c "export P4SSLDIR=$P4SSLDIR && p4d -Gc"
 fi
 
-chown -R perforce:perforce /perforce-data
+chown -R perforce:perforce $P4ROOT
 p4dctl start $SERVER_ID 
-tail -F /perforce-data/logs/log
+tail -F $P4ROOT/logs/log

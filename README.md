@@ -26,7 +26,8 @@ services:
     environment:
       # The port on which the Perforce server will listen. This is the default port.
       - P4PORT=1666
-      # The root directory of the Perforce server. This is the default value. Do not change this.
+      # The root directory of the Perforce server. This is the default value. Make sure it matches
+      # the volume mount above.
       - P4ROOT=/perforce-data
       # The server ID. You can change this to whatever you want.
       - SERVER_ID=perforce
@@ -48,14 +49,14 @@ services:
 
 ### Master user password
 
-Since I didn't want to have an insecure default password, this container will create a random password for the master user. The password will be printed to the console when the container starts. You can change this password later using the `p4 passwd` command.
+Since I didn't want to have an insecure default password, this container will create a random password for the master user. The password will be printed to the console when the container starts. You can change this password later using a perforce client.
 
 ```bash
 perforce-perforce-1  | Generating random master password...
 perforce-perforce-1  | Master password: yhkQP3hYrg5yns7d2EepV1fm9wAcEIGu
 ```
 
-**This password will only be printed once**, so make sure to copy it somewhere safe. If you want to change the password later, you can use the `p4 passwd` command. In case you lost the password, you can always delete the container and the contents of the `p4dctl.conf.d` folder and start over.
+**This password will only be printed once**, so make sure to copy it somewhere safe. In case you lost the password, you can always delete the container and the contents of the `p4dctl.conf.d` folder and start over.
 
 ## SSL Certificates
 
