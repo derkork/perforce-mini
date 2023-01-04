@@ -2,9 +2,9 @@
 set -e
 
 # change user-id of perforce user to match the host user-id
-usermod -u $PERFORCE_UID perforce
+usermod -o -u $PERFORCE_UID perforce
 # change group-id of perforce group to match the host group-id
-groupmod -g $PERFORCE_GID perforce
+groupmod -o -g $PERFORCE_GID perforce
 
 # if the perforce config file doesn't exist, run the config script
 if [ ! -f /etc/perforce/p4dctl.conf.d/perforce.conf ]; then
