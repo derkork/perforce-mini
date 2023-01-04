@@ -24,24 +24,42 @@ services:
       # folder.
       - ./perforce-data:/perforce-data
     environment:
-      # The port on which the Perforce server will listen. This is the default port.
-      - P4PORT=1666
-      # The root directory of the Perforce server. This is the default value. Make sure it matches
-      # the volume mount above.
-      - P4ROOT=/perforce-data
-      # The server ID. You can change this to whatever you want.
-      - SERVER_ID=perforce
-      # This is the master user that will be created. The password for this user will be
-      # randomly generated and printed to the console when the container starts. You can 
-      # later change this password using the `p4 passwd` command.
-      - MASTER_USER=perforce-master
+      # === REQUIRED SETTINGS ===
       # The UID and GID of the user running the perforce server. While the container runs as
       # root, the perforce server itself will run as a non-priveleged user. This is the UID and
       # GID of that user. Make it match a user of the host system so that the files created by
       # the perforce server will be owned by that user. This is important so you can backup
-      # the data directory on the host system.
+      # the data directory on the host system. Both values are required.
       - PERFORCE_UID=1000
       - PERFORCE_GID=1000
+
+      # === OPTIONAL SETTINGS ===
+      # The following settings have reasonable defaults, but you can change them if you need to.
+      
+      # The port on which the Perforce server will listen. Optional, if unset the value will be `1666`.
+      - P4PORT=1666
+      # The root directory of the Perforce server. Make sure it matches the volume mount above.
+      # Optional, if unset the value will be `/perforce-data`.
+      - P4ROOT=/perforce-root
+      # The server ID. You can change this to whatever you want. Optional, if unset the value will
+      # be `perforce`.
+      - SERVER_ID=my-perforce-server
+      # This is the master user that will be created. The password for this user will be
+      # randomly generated and printed to the console when the container starts. You can 
+      # later change this password using the `p4 passwd` command. Optional, if unset the value
+      # will be `perforce-master`.
+      - MASTER_USER=perforce-root
+      # Additional arguments for the first time setup of perforce. These values are allowed
+      # `--unicode` - enables unicode support
+      # `--case 0` - enables case sensitivity 
+      # `--case 1` - disables case sensitivity	
+      # Optional, if unset the value will be `--unicode`.
+      - PERFORCE_SETUP_OPTS=--unicode --case 0
+      # Additional arguments for the perforce server. Optional, if unset the value will be
+      # empty. See the [Perforce documentation](https://www.perforce.com/manuals/p4sag/Content/P4SAG/appendix.p4d.html)
+      # for a list of available options.
+      - PERFORCE_SERVER_OPTS=
+
     ports:
       # The port to expose. Make sure it matches the P4PORT environment variable.
       - 1666:1666

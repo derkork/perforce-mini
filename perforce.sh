@@ -1,6 +1,18 @@
 #!/bin/bash
 set -e
 
+# error out if PERFORCE_UID or PERFORCE_GID is not set
+if [ -z "$PERFORCE_UID" ]; then
+    echo "PERFORCE_UID is not set"
+    exit 1
+fi
+
+if [ -z "$PERFORCE_GID" ]; then
+    echo "PERFORCE_GID is not set"
+    exit 1
+fi
+
+
 # change user-id of perforce user to match the host user-id
 usermod -o -u $PERFORCE_UID perforce
 # change group-id of perforce group to match the host group-id
@@ -15,16 +27,16 @@ if [ ! -f /etc/perforce/p4dctl.conf.d/perforce.conf ]; then
     echo "Generating random master password..."
     MASTER_PASSWORD=$(pwgen -s 32 1)
     echo "Master password: $MASTER_PASSWORD"
-    /opt/perforce/sbin/configure-helix-p4d.sh $SERVER_ID -n -p ssl:$P4PORT -r $P4ROOT -u $MASTER_USER -P $MASTER_PASSWORD --unicode 
+    /opt/perforce/sbin/configure-helix-p4d.sh ${SERVER_ID:-perforce} -n -p ssl:${P4PORT:-1666} -r ${P4ROOT:-/opt/perforce-data} -u ${MASTER_USER:-perforce-master} -P $MASTER_PASSWORD ${PERFORCE_SETUP_OPTS:---unicode} 
 fi
 
 # if there are no SSL certificates, generate them
-export P4SSLDIR=$P4ROOT/root/ssl
+export P4SSLDIR=${P4ROOT:-/opt/perforce-data}/root/ssl
 if [ ! -f $P4SSLDIR/certificate.txt ]; then
     echo "No SSL certificates found, re-generating them..."
     su - perforce -c "export P4SSLDIR=$P4SSLDIR && p4d -Gc"
 fi
 
-chown -R perforce:perforce $P4ROOT
-p4dctl start $SERVER_ID 
-tail -F $P4ROOT/logs/log
+chown -R perforce:perforce ${P4ROOT:-/opt/perforce-data}
+p4dctl start ${SERVER_ID:-perforce} ${PERFORCE_SERVER_OPTS}
+tail -F ${P4ROOT:-/opt/perforce-data}/logs/log

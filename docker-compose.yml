@@ -8,10 +8,6 @@ services:
       - ./p4dctl.conf.d:/etc/perforce/p4dctl.conf.d
       - ./perforce-data:/perforce-data
     environment:
-      - P4PORT=1666
-      - P4ROOT=/perforce-data
-      - SERVER_ID=perforce
-      - MASTER_USER=perforce-master
       - PERFORCE_UID=1000
       - PERFORCE_GID=1000
     ports:
